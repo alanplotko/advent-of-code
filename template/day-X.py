@@ -3,7 +3,6 @@ import sys, time
 '''''''''''''''''''''
 SETUP
 '''''''''''''''''''''
-
 # Start timer
 startTime = time.time()
 
@@ -14,7 +13,6 @@ TRACE = False
 '''''''''''''''''''''
 DATA PARSING
 '''''''''''''''''''''
-
 # Parse data
 data = [line.rstrip() for line in sys.stdin.readlines()]
 
@@ -23,18 +21,15 @@ HELPERS
 '''''''''''''''''''''
 
 
-
 '''''''''''''''''''''
 MAIN SOLVER FUNCTION
 '''''''''''''''''''''
-
 def solve():
     return None
 
 '''''''''''''''''''''
 LOG SOLUTIONS
 '''''''''''''''''''''
-
 sol1 = solve()
 sol2 = solve()
 
