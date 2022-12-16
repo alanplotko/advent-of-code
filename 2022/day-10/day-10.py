@@ -1,71 +1,79 @@
-import sys
+import sys, time
 
-# Parse data
-data = [x.split() for x in [line.rstrip() for line in sys.stdin.readlines()]]
+'''''''''''''''''''''
+MAIN SOLVER FUNCTION
+'''''''''''''''''''''
+def solve():
+    '''
+    Inner function helpers
+    '''
+    def addx(val):
+        nonlocal register, states
+        states += [register, register + val]
+        register += val
 
-"""
-Solution 1
-"""
-
-# Register starts at 1
-register = 1
-states = []
-signalStrength = 0
-
-# This gives the end result per cycle
-for command in data:
-    # Append regardless of noop or addx
-    states.append(register)
-    # Perform the addition only for addx
-    if command[0] == 'addx':
-        register += int(command[1])
+    def noop():
+        nonlocal register, states
         states.append(register)
 
-# Cycles are: 20, 60, 100, 140, 180, 220
-for i in range(20, 221, 40):
-    # For debugging
-    # print("State %d = %d, adding %d" % (i, states[i - 2], i * states[i - 2]))
+    '''
+    Solution 1
+    '''
+    # Register starts at 1
+    register = 1
+    states = []
+
+    # Run commands
+    [addx(int(x[1])) if x[0] == "addx" else noop() for x in data]
 
     # Calculate signal strength by multiplying cycle (i) and register value
     # during cycle. Offset states index by 2 to get the register value during
     # the cycle instead of the end of the cycle.
-    signalStrength += (i * states[i - 2])
+    signalStrength = sum([i * states[i - 2] for i in range(20, 221, 40)])
 
-"""
-Solution 2
-"""
+    '''
+    Solution 2
+    '''
+    # Image contains 6 rows of 40 width to display 8 capital letters for solution 2
+    image = []
+    currentRow = ""
+    # To work during the cycle, prepend the first state to the beginning of the array
+    states = [states[0]] + states
+    for idx, state in enumerate(states):
+        if len(currentRow) == 40:
+            image.append(currentRow)
+            currentRow = ""
+        currentRow += ("#" if ((idx + 1) % 40) - state in [0, 1, 2] else ".")
 
-# Image contains 6 rows of 40 width to display 8 capital letters for solution 2
-image = []
-# Track current row of 40 cycles in the image
-currentRow = ""
+    return (signalStrength, image)
 
-# To work during the cycle, prepend the first state to the beginning of the array
-states = [states[0]] + states
-for idx, state in enumerate(states):
-    # Start new row every 40 cycles
-    if len(currentRow) == 40:
-        image.append(currentRow)
-        currentRow = ""
+'''''''''''''''''''''
+SETUP
+'''''''''''''''''''''
+# Print statements
+DEBUG = False
+TRACE = False
 
-    # Always work from cycles 1-40
-    cycle = (idx + 1) % 40
+# Start timer
+startTime = time.time()
 
-    # Check if within 0-2, since the sprite is 3 wide
-    if cycle - state in [0, 1, 2]:
-        currentRow += "#" # Matched sprite position
-    else:
-        currentRow += "." # Sprite was not in range
+'''''''''''''''''''''
+DATA PARSING
+'''''''''''''''''''''
+# Parse data
+data = [x.split() for x in [line.rstrip() for line in sys.stdin.readlines()]]
 
-    # For debugging
-    # print("Cycle #%d: %d" % (cycle if cycle != 0 else 40, state))
-    # print(currentRow)
-
+'''''''''''''''''''''
+SOLVING & LOGGING
+'''''''''''''''''''''
+signalStrength, image = solve()
 sol1 = signalStrength
-sol2 = "See 8 capital letters in rendered image below"
+sol2 = [''.join(row) for row in image]
 
-print("Part 1: " + str(sol1))
-print("Part 2: " + str(sol2))
+# Log execution time and solutions
+print(f"--- Ran for {(time.time() - startTime)} seconds ---")
+print(f"Part 1: {str(sol1)}")
 
-for row in image:
-    print(row)
+# Print image for solution 2
+print(f"Part 2:")
+print(*sol2, sep='\n')

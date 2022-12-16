@@ -1,20 +1,10 @@
-import sys, re, copy
+import sys, time, re, copy
 
-# Parse data
-data = [re.sub(r'[^\w\s]', '', x) for x in [line.rstrip() for line in sys.stdin.readlines()]]
-numStacks = len(data[data.index('') - 1].split())
-instructions = [x.split() for x in data[data.index('') + 1:]]
-
-# Read lines and format as stacks
-lines = [x.split() for x in [x[0].replace("    ", " - ") for x in [x.split(r'(\s+)') for x in data[0:data.index('') - 1]]]]
-stacks = [[x for x in [x[i] if len(x) > i else '-' for x in lines] if x != "-"] for i in range(numStacks)]
-
-print(data)
-print(lines)
-print(stacks)
-
+'''''''''''''''''''''
+MAIN SOLVER FUNCTION
+'''''''''''''''''''''
 # Perform the moves from the instructions
-def executeInstructions(stack, needsReverse):
+def solve(stack, needsReverse):
     # Deepcopy since we have a list of lists
     lst = copy.deepcopy(stack)
     for step in instructions:
@@ -32,9 +22,41 @@ def executeInstructions(stack, needsReverse):
         lst[dstPos] = selected + lst[dstPos]
     return lst
 
-# Get the first item from each stack
-sol1 = ''.join([x[0] for x in executeInstructions(stacks, True)])
-sol2 = ''.join([x[0] for x in executeInstructions(stacks, False)])
+'''''''''''''''''''''
+SETUP
+'''''''''''''''''''''
+# Print statements
+DEBUG = False
+TRACE = False
 
-print("Part 1: " + str(sol1))
-print("Part 2: " + str(sol2))
+# Start timer
+startTime = time.time()
+
+'''''''''''''''''''''
+DATA PARSING
+'''''''''''''''''''''
+# Parse data
+data = [re.sub(r'[^\w\s]', '', x) for x in [line.rstrip() for line in sys.stdin.readlines()]]
+numStacks = len(data[data.index('') - 1].split())
+instructions = [x.split() for x in data[data.index('') + 1:]]
+
+# Read lines and format as stacks
+lines = [x.split() for x in [x[0].replace("    ", " - ") for x in [x.split(r'(\s+)') for x in data[0:data.index('') - 1]]]]
+stacks = [[x for x in [x[i] if len(x) > i else '-' for x in lines] if x != "-"] for i in range(numStacks)]
+
+if DEBUG:
+    print(data)
+    print(lines)
+    print(stacks)
+
+'''''''''''''''''''''
+SOLVING & LOGGING
+'''''''''''''''''''''
+# Get the first item from each stack
+sol1 = ''.join([x[0] for x in solve(stacks, True)])
+sol2 = ''.join([x[0] for x in solve(stacks, False)])
+
+# Log execution time and solutions
+print(f"--- Ran for {(time.time() - startTime)} seconds ---")
+print(f"Part 1: {str(sol1)}")
+print(f"Part 2: {str(sol2)}")

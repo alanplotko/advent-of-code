@@ -1,7 +1,24 @@
-import sys
+import sys, time
 
+'''''''''''''''''''''
+SETUP
+'''''''''''''''''''''
+# Print statements
+DEBUG = False
+TRACE = False
+
+# Start timer
+startTime = time.time()
+
+'''''''''''''''''''''
+DATA PARSING
+'''''''''''''''''''''
+# Parse data
 data = [x.split() for x in [line.rstrip() for line in sys.stdin.readlines()]]
 
+'''''''''''''''''''''
+SOLVING & LOGGING
+'''''''''''''''''''''
 # Part 1
 # Components: list of [shape score, result score].
 # Shape score: Map X-Z to 1-3.
@@ -24,5 +41,7 @@ sol1 = sum([x[0] + (3 if x[1] == 0 else (6 if x[1] == 1 else 0)) for x in compon
 #   can transform to by 0-2 * 3 = (0, 3, 6), and sum them up.
 sol2 = sum([((((ord(x[0]) - 65) + (ord(x[1]) - 89)) % 3) + 1) + ((ord(x[1]) - 88) * 3) for x in data])
 
-print("Part 1: " + str(sol1))
-print("Part 2: " + str(sol2))
+# Log execution time
+print(f"--- Ran for {(time.time() - startTime)} seconds ---")
+print(f"Part 1: {str(sol1)}")
+print(f"Part 2: {str(sol2)}")

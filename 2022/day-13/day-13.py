@@ -1,10 +1,9 @@
-import sys, math
+import sys, time, math
 from functools import cmp_to_key
 
-# Parse data as pairs
-data = [line.rstrip() for line in sys.stdin.readlines()]
-pairs = [eval(line) for line in data if line != '']
-
+'''''''''''''''''''''
+HELPERS
+'''''''''''''''''''''
 # Recursive check function that takes left, right, and index for list where applicable
 # 0 = equal
 # -1 = less than (correct order)
@@ -52,20 +51,48 @@ def check(left, right, idx = 0):
 def compare(left, right):
     return check(left, right, 0)
 
-# Walk through pairs for solution 1
-results = []
-for i in range(0, len(pairs), 2):
-    left = pairs[i]
-    right = pairs[i + 1]
-    result = check(left, right, 0)
-    results.append(result)
-    # For debugging
-    # print("Pair %d = %s\nLeft = %s ; Right = %s\n" % (len(results), result, left, right))
+'''''''''''''''''''''
+MAIN SOLVER FUNCTION
+'''''''''''''''''''''
+def solve(dividers):
+    # Walk through pairs for solution 1
+    results = []
+    for i in range(0, len(pairs), 2):
+        left = pairs[i]
+        right = pairs[i + 1]
+        result = check(left, right, 0)
+        results.append(result)
+        if DEBUG:
+            print("Pair %d = %s\nLeft = %s ; Right = %s\n" % (len(results), result, left, right))
+
+    pairs.extend(dividers)
+    correctOrder = sorted(pairs, key=cmp_to_key(compare))
+    return (results, correctOrder)
+
+'''''''''''''''''''''
+SETUP
+'''''''''''''''''''''
+# Print statements
+DEBUG = False
+TRACE = False
+
+# Start timer
+startTime = time.time()
+
+'''''''''''''''''''''
+DATA PARSING
+'''''''''''''''''''''
+# Parse data as pairs
+data = [line.rstrip() for line in sys.stdin.readlines()]
+pairs = [eval(line) for line in data if line != '']
 
 # Add dividers to pairs for solution 2
 dividers = [[[2]], [[6]]]
-pairs.extend(dividers)
-correctOrder = sorted(pairs, key=cmp_to_key(compare))
+
+'''''''''''''''''''''
+SOLVING & LOGGING
+'''''''''''''''''''''
+results, correctOrder = solve(dividers)
 
 # Solution 1: Sum of pair #s (1-indexed) where order is right (result = -1)
 sol1 = sum([idx + 1 if x == -1 else 0 for idx, x in enumerate(results)])
@@ -73,5 +100,7 @@ sol1 = sum([idx + 1 if x == -1 else 0 for idx, x in enumerate(results)])
 # Solution 2: Product of divider indices (1-indexed) after all packets (lines irrespective of initial pairs) are sorted
 sol2 = math.prod([correctOrder.index(divider) + 1 for divider in dividers])
 
-print("Part 1: " + str(sol1))
-print("Part 2: " + str(sol2))
+# Log execution time and solutions
+print(f"--- Ran for {(time.time() - startTime)} seconds ---")
+print(f"Part 1: {str(sol1)}")
+print(f"Part 2: {str(sol2)}")

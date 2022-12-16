@@ -1,8 +1,8 @@
-import sys
+import sys, time
 
-# Parse data
-data = [[x.split()[0], int(x.split()[1])] for x in [line.rstrip() for line in sys.stdin.readlines()]]
-
+'''''''''''''''''''''
+HELPERS
+'''''''''''''''''''''
 # Move first head and then simulate for every following head (tail)
 def move(numKnots, axis, direction, movement, heads, tails):
     # For every movemet, we start with the head
@@ -23,8 +23,8 @@ def move(numKnots, axis, direction, movement, heads, tails):
                 else:
                     tail[1] -= 1
 
-                # For debugging
-                # print("Movement: %s, %s" % (head, tail))
+                if DEBUG:
+                    print("Movement: %s, %s" % (head, tail))
 
                 # Track tail movement if on last head (tail of Snake)
                 if i == numKnots - 2:
@@ -38,8 +38,8 @@ def move(numKnots, axis, direction, movement, heads, tails):
                     tail[0] += 1
                 else:
                     tail[0] -= 1
-                # For debugging
-                # print("Movement: %s, %s" % (head, tail))
+                if DEBUG:
+                    print("Movement: %s, %s" % (head, tail))
 
                 # Track tail movement if on last head (tail of Snake)
                 if i == numKnots - 2:
@@ -60,9 +60,12 @@ def move(numKnots, axis, direction, movement, heads, tails):
             if i == numKnots - 2:
                 tails.add(tuple(heads[-1].copy()))
 
-            # For debugging
-            # print("Movement: %s, %s" % (head, tail))
+            if DEBUG:
+                print("Movement: %s, %s" % (head, tail))
 
+'''''''''''''''''''''
+MAIN SOLVER FUNCTION
+'''''''''''''''''''''
 # Solve for number of knots, track last head (tail)
 def solve(numKnots):
     # Number of knots, last head is the tail, think of it like Snake
@@ -86,14 +89,35 @@ def solve(numKnots):
         else:
             continue
 
-        # For debugging
-        # print("%s, %s" % (command, heads))
+        if DEBUG:
+            print("%s, %s" % (command, heads))
 
     return len(tails)
 
+'''''''''''''''''''''
+SETUP
+'''''''''''''''''''''
+# Print statements
+DEBUG = False
+TRACE = False
+
+# Start timer
+startTime = time.time()
+
+'''''''''''''''''''''
+DATA PARSING
+'''''''''''''''''''''
+# Parse data
+data = [[x.split()[0], int(x.split()[1])] for x in [line.rstrip() for line in sys.stdin.readlines()]]
+
+'''''''''''''''''''''
+SOLVING & LOGGING
+'''''''''''''''''''''
 # Solve for number of knots
 sol1 = solve(2)
 sol2 = solve(10)
 
-print("Part 1: " + str(sol1))
-print("Part 2: " + str(sol2))
+# Log execution time and solutions
+print(f"--- Ran for {(time.time() - startTime)} seconds ---")
+print(f"Part 1: {str(sol1)}")
+print(f"Part 2: {str(sol2)}")

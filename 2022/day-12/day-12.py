@@ -1,12 +1,11 @@
-import sys, copy
+import sys, time
+from collections import deque
+from copy import deepcopy
 
-'''
+'''''''''''''''''''''
 Edited Djikstra implementation
 From https://www.techiedelight.com/find-shortest-path-source-destination-matrix-satisfies-given-constraints/
-'''
-
-from collections import deque
-
+'''''''''''''''''''''
 # A queue node used in BFS
 class Node:
 	# (x, y) represents coordinates of a cell in the matrix
@@ -32,7 +31,6 @@ def getPath(node, path=[]):
 	if node:
 		getPath(node.parent, path)
 		path.append(node)
-
 
 # Find the shortest route in a matrix from source cell (x, y) to
 # destination cell (N-1, N-1)
@@ -106,10 +104,9 @@ def findPath(matrix, start, end):
 	# return None if the path is not possible
 	return None
 
-'''
-Advent of Code 2022
-'''
-
+'''''''''''''''''''''
+HELPERS
+'''''''''''''''''''''
 # Translate letters to numbers
 def translate(n):
 	if n == 'S':
@@ -131,23 +128,18 @@ def findPositions(startChar):
 				end = [i, j]
 	return (start, end)
 
-# Parse data
-data = [[*x] for x in [line.rstrip() for line in sys.stdin.readlines()]]
-rows = len(data)
-cols = len(data[0])
-
-# Convert data to number values
-matrix = [list(map(lambda n: translate(n), x)) for x in data]
-
+'''''''''''''''''''''
+MAIN SOLVER FUNCTION
+'''''''''''''''''''''
 # Solve for all starting positions, return minimum length
 def solve(positions, filenamePrefix):
-	letterMatrix = copy.deepcopy(data)
-	numberMatrix = copy.deepcopy(matrix)
+	letterMatrix = deepcopy(data)
+	numberMatrix = deepcopy(matrix)
 	startPositions = positions[0]
 	end = positions[1]
 
-	# For debugging
-	# print("Start = %s, end = %s" % (startPositions, end))
+	if DEBUG:
+		print("Start = %s, end = %s" % (startPositions, end))
 
 	paths = []
 	for start in startPositions:
@@ -170,16 +162,43 @@ def solve(positions, filenamePrefix):
 				letterMatrix[i][j] = '.'
 
 	# Write output to file
-	f = open(filenamePrefix + "-output.txt", "w")
-	for x in letterMatrix:
-		f.write(''.join(x) + "\n")
-	f.close()
+	if TRACE:
+		f = open(filenamePrefix + "-output.txt", "w")
+		for x in letterMatrix:
+			f.write(''.join(x) + "\n")
+		f.close()
 
 	# Return minimum path length encountered
 	return minLength
 
+'''''''''''''''''''''
+SETUP
+'''''''''''''''''''''
+# Print statements
+DEBUG = False
+TRACE = False
+
+# Start timer
+startTime = time.time()
+
+'''''''''''''''''''''
+DATA PARSING
+'''''''''''''''''''''
+# Parse data
+data = [[*x] for x in [line.rstrip() for line in sys.stdin.readlines()]]
+rows = len(data)
+cols = len(data[0])
+
+# Convert data to number values
+matrix = [list(map(lambda n: translate(n), x)) for x in data]
+
+'''''''''''''''''''''
+SOLVING & LOGGING
+'''''''''''''''''''''
 sol1 = solve(findPositions('S'), "sol1")
 sol2 = solve(findPositions('a'), "sol2")
 
-print("Part 1: " + str(sol1))
-print("Part 2: " + str(sol2))
+# Log execution time and solutions
+print(f"--- Ran for {(time.time() - startTime)} seconds ---")
+print(f"Part 1: {str(sol1)}")
+print(f"Part 2: {str(sol2)}")
