@@ -5,7 +5,6 @@ from collections import defaultdict
 Graph and Dijsktra implementation
 From https://benalexkeen.com/implementing-djikstras-shortest-path-algorithm-with-python/
 '''''''''''''''''''''
-
 class Graph():
     def __init__(self):
         """
