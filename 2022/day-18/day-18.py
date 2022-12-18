@@ -17,7 +17,7 @@ MAIN SOLVER FUNCTION
 '''''''''''''''''''''
 def solve():
     # Get maximum bound for x, y, or z
-    maxBound = max([max(x) for x in data.keys()]) + 1
+    maxBound = max([max(x) for x in data]) + 1
 
     # Generate 3d grid for solution 2 initialized to air = 0 if point not in input, or lava = 1 if point in input
     grid = {point: (1 if point in data else 0) for point in [(x, y, z) for x in range(maxBound) for y in range(maxBound) for z in range(maxBound)]}
@@ -27,7 +27,7 @@ def solve():
 
     # Get all lava points' neighbors that are also in input data
     # Optimization: O(1) lookups against dict where marked as lava = 1 vs. checking if point present in list
-    lavaNeighbors = {point: [neighbor for neighbor in allNeighbors[point] if grid[neighbor] == 1] for point in data.keys()}
+    lavaNeighbors = {point: [neighbor for neighbor in allNeighbors[point] if grid[neighbor] == 1] for point in data}
 
     '''
     Solution 1
