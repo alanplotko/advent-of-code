@@ -3,10 +3,6 @@ from collections import deque
 from copy import deepcopy
 
 '''''''''''''''''''''
-HELPERS
-'''''''''''''''''''''
-
-'''''''''''''''''''''
 MAIN SOLVER FUNCTION
 '''''''''''''''''''''
 def solve(monkeys, rounds, worryDivisor, commonMod):
