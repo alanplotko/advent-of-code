@@ -1,21 +1,17 @@
 import sys, time
 from collections import deque
+from operator import add
 
 '''''''''''''''''''''
 HELPERS
 '''''''''''''''''''''
-# Get neighbors for point within [0, maxBound) from all points (filterToDataOnly=False) or only
-# points from input data (filterToDataOnly=True)
-def getNeighbors(point, maxBound, filterToDataOnly=False):
-    x, y, z = point
+# Get all neighbors for point in bounds [0, maxBound). If restricting to input data, filter out points not in input data.
+def getNeighbors(point, maxBound, restrictToData=False):
     neighbors = [
-        (x + dx, y + dy, z + dz)
-        for dx, dy, dz in [(1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1)]
-        if y + dy in range(maxBound) and x + dx in range(maxBound) and z + dz in range(maxBound)
+        neighbor for movement in [(1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1)]
+        if max((neighbor := tuple(map(add, point, movement)))) < maxBound and min(neighbor) >= 0
     ]
-    # Filter out points not in data if filterToDataOnly = True, otherwise return all
-    # possible neighbors for floodfill
-    return [point for point in neighbors if point in data] if filterToDataOnly else neighbors
+    return neighbors if not restrictToData else [neighbor for neighbor in neighbors if neighbor in data]
 
 '''''''''''''''''''''
 MAIN SOLVER FUNCTION
@@ -36,7 +32,6 @@ def solve():
     '''
     Solution 2
     '''
-
     # Generate 3d grid initialized to air = 0 if point not in input, or lava = 1 if point in input
     grid = {point: (1 if point in data else 0) for point in [(x, y, z) for x in range(maxBound) for y in range(maxBound) for z in range(maxBound)]}
 
