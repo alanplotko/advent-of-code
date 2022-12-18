@@ -62,7 +62,7 @@ def solve():
     for point in grid.keys():
         if grid[point] == 0:
             # Get the values rather than the neighbors
-            overCounted += sum([grid[(x, y, z)] for (x, y, z) in getNeighbors(point, maxBound)])
+            overCounted += sum([grid[pt] for pt in getNeighbors(point, maxBound)])
 
     return (surfaceArea, surfaceArea - overCounted)
 
