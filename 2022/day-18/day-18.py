@@ -6,38 +6,42 @@ from operator import add
 HELPERS
 '''''''''''''''''''''
 # Get all neighbors for point in bounds [0, maxBound). If restricting to input data, filter out points not in input data.
-def getNeighbors(point, maxBound, restrictToData=False):
-    neighbors = [
+def getNeighbors(point, maxBound):
+    return [
         neighbor for movement in [(1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1)]
         if max((neighbor := tuple(map(add, point, movement)))) < maxBound and min(neighbor) >= 0
     ]
-    return neighbors if not restrictToData else [neighbor for neighbor in neighbors if neighbor in data]
 
 '''''''''''''''''''''
 MAIN SOLVER FUNCTION
 '''''''''''''''''''''
 def solve():
     # Get maximum bound for x, y, or z
-    maxBound = max([max(x) for x in data]) + 1
+    maxBound = max([max(x) for x in data.keys()]) + 1
+
+    # Generate 3d grid for solution 2 initialized to air = 0 if point not in input, or lava = 1 if point in input
+    grid = {point: (1 if point in data else 0) for point in [(x, y, z) for x in range(maxBound) for y in range(maxBound) for z in range(maxBound)]}
+
+    # Precompute all neighbors for grid
+    allNeighbors = {point: getNeighbors(point, maxBound) for point in grid}
+
+    # Get all lava points' neighbors that are also in input data
+    # Optimization: O(1) lookups against dict where marked as lava = 1 vs. checking if point present in list
+    lavaNeighbors = {point: [neighbor for neighbor in allNeighbors[point] if grid[neighbor] == 1] for point in data.keys()}
 
     '''
     Solution 1
     '''
-    # Get neighbors for point in data where also present in data
-    neighbors = {point: getNeighbors(point, maxBound, True) for point in data}
     maxFaces = len(data) * 6
-    intersections = sum(len(x) for x in neighbors.values())
+    intersections = sum([len(x) for x in lavaNeighbors.values()])
     surfaceArea = maxFaces - intersections
 
     '''
     Solution 2
     '''
-    # Generate 3d grid initialized to air = 0 if point not in input, or lava = 1 if point in input
-    grid = {point: (1 if point in data else 0) for point in [(x, y, z) for x in range(maxBound) for y in range(maxBound) for z in range(maxBound)]}
-
     # Start at origin for running floodfill
     floodfill = deque([(0, 0, 0)])
-    visited = {}
+    visited = {} # O(1) lookups in dict for performance
 
     # Floodfill where air = 0 to water = -1
     while floodfill:
@@ -47,17 +51,18 @@ def solve():
         if grid[point] == 0:
             grid[point] = -1
             # Traverse through unvisited neighbors to find next locations for floodfill
-            unvisited = [neighbor for neighbor in getNeighbors(point, maxBound) if neighbor not in visited]
+            unvisited = [neighbor for neighbor in allNeighbors[point] if neighbor not in visited]
             for neighbor in unvisited:
                 floodfill.append(neighbor)
                 visited[neighbor] = True
 
     # Subtract sum of overcounted faces from total
     overCounted = 0
-    for point in grid.keys():
-        if grid[point] == 0:
-            # Get the values rather than the neighbors
-            overCounted += sum([grid[neighbor] for neighbor in getNeighbors(point, maxBound)])
+
+    # Get all points where air = 0
+    airPockets = [point for point,value in grid.items() if value == 0]
+    for point in airPockets:
+        overCounted += sum([grid[neighbor] for neighbor in allNeighbors[point]])
 
     return (surfaceArea, surfaceArea - overCounted)
 
@@ -74,8 +79,8 @@ startTime = time.time()
 '''''''''''''''''''''
 DATA PARSING
 '''''''''''''''''''''
-# Parse data
-data = [tuple(map(int, x)) for x in [x.split(",") for x in [line.rstrip() for line in sys.stdin.readlines()]]]
+# Parse data as dict for fast O(1) lookups
+data = {tuple(map(int, x)): True for x in [x.split(",") for x in [line.rstrip() for line in sys.stdin.readlines()]]}
 
 '''''''''''''''''''''
 SOLVING & LOGGING
