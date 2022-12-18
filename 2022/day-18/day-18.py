@@ -52,7 +52,7 @@ def solve():
         if grid[point] == 0:
             grid[point] = -1
             # Traverse through unvisited neighbors to find next locations for floodfill
-            unvisited = [pt for pt in getNeighbors(point, maxBound) if pt not in visited]
+            unvisited = [neighbor for neighbor in getNeighbors(point, maxBound) if neighbor not in visited]
             for neighbor in unvisited:
                 floodfill.append(neighbor)
                 visited[neighbor] = True
@@ -62,7 +62,7 @@ def solve():
     for point in grid.keys():
         if grid[point] == 0:
             # Get the values rather than the neighbors
-            overCounted += sum([grid[pt] for pt in getNeighbors(point, maxBound)])
+            overCounted += sum([grid[neighbor] for neighbor in getNeighbors(point, maxBound)])
 
     return (surfaceArea, surfaceArea - overCounted)
 
