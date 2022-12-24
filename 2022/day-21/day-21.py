@@ -4,7 +4,7 @@ from operator import add, sub, mul, floordiv
 '''''''''''''''''''''
 HELPERS
 '''''''''''''''''''''
-# Use floor div to
+# Use floor div to ensure int solution
 ops = { "+": add, "-": sub, "*": mul, "/": floordiv }
 
 def translateSol1(node):
