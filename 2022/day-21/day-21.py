@@ -48,7 +48,7 @@ def solve():
     # Get both sides for new root
     left, right = translateSol2(data['root']).split(' == ')
 
-    # Remove outer parentheses, use floor division for eval
+    # Remove outer parentheses
     left = left[1:len(left)]
     right = right[0:len(right) - 1]
 
