@@ -129,7 +129,6 @@ if DEBUG:
 
 # Set up blizzard locations as dicts
 blizzards = {}
-blizzardUid = 0
 
 # Navigate inner grid
 for row in range(1, totalRows + 1):
