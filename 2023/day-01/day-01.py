@@ -3,7 +3,7 @@ import sys, time, regex
 '''''''''''''''''''''
 MAIN SOLVER FUNCTION
 '''''''''''''''''''''
-def solve(pattern, useMapping = False):
+def solve(pattern):
     mapping = {'one': '1', 'two': '2', 'three': '3', 'four': '4', 'five': '5', 'six': '6', 'seven': '7', 'eight': '8', 'nine': '9'}
     sol = 0
     for line in data:
@@ -34,7 +34,7 @@ data = [line.rstrip() for line in sys.stdin.readlines()]
 SOLVING & LOGGING
 '''''''''''''''''''''
 sol1 = solve("\d")
-sol2 = solve("(\d|one|two|three|four|five|six|seven|eight|nine)", True)
+sol2 = solve("(\d|one|two|three|four|five|six|seven|eight|nine)")
 
 # Log execution time
 print(f"--- Ran for {(time.time() - startTime)} seconds ---")
