@@ -19,6 +19,7 @@ advent() {
       echo "Initializing day $1..."
       mkdir -p "./day-$n"
       cp "../template/day-X.py" "./day-$n/day-$n.py"
+      aocd $1 $year --example > "./day-$n/test.txt"
       aocd $1 $year > "./day-$n/input.txt"
       echo "Setup complete for day $1"
       return
