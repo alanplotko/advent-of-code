@@ -7,6 +7,7 @@ advent() {
   # Shorcut when in repo/<year> to run solutions for /day-x without cd'ing into it
   if [[ "$PWD" =~ .*"/advent-of-code/"[0-9]{4}$ ]]; then
     n=$(printf %02d $1)
+    year=$(basename "$PWD")
     if ! [ -z "$1" ] && [[ $1 =~ ^[0-9]{1,2}$ ]] && [ -d "./day-$n" ]; then
       filenames+=( "./day-$n/test.txt" )
       # For parsing find results, see latest 2020 update on bash 4.4-alpha+ here: https://stackoverflow.com/questions/23356779/how-can-i-store-the-find-command-results-as-an-array-in-bash/23357277#23357277
@@ -18,7 +19,7 @@ advent() {
       echo "Initializing day $1..."
       mkdir -p "./day-$n"
       cp "../template/day-X.py" "./day-$n/day-$n.py"
-      aocd $1 $(date +%Y) > "./day-$n/input.txt"
+      aocd $1 $year > "./day-$n/input.txt"
       echo "Setup complete for day $1"
       return
     fi
