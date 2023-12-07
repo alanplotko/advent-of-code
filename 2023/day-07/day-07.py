@@ -13,7 +13,7 @@ ONE_PAIR = 2
 HIGH_CARD = 1
 
 def compute_rank(hand):
-    # Operate with Jokers if 'J' is smallest individual rank
+    # Operate with jokers if 'J' is smallest individual rank
     if RANKS[0] == 'J':
         mapping = sorted(({card: hand.count(card) for card in set(hand) if card != 'J'}).items(), key=lambda x:x[1], reverse=True)
         jokers = hand.count('J')
@@ -49,6 +49,7 @@ def compute_rank(hand):
 
     return HIGH_CARD
 
+# Comparator for Camel Cards game
 def compare_hands(hand1, hand2):
     hand1 = hand1[0]
     hand2 = hand2[0]
