@@ -3,116 +3,76 @@ import sys, time, re, math
 '''''''''''''''''''''
 HELPERS
 '''''''''''''''''''''
+# Encountered error in tracking seed ranges, corrected by comparing with sample solution from Advent of Code Subreddit
+# Important: reduce visit scope while translating ranges, especially given the input size
+# Inspiration from sample solution to merge range exploration for both sol1 and sol2 (with sol1 just being a range of 1)
 def translate_locations(seeds, mapping):
-    locations = {}
-    for seed in seeds:
-        locations[seed] = translate_location(seed, mapping)
-    return locations
-
-# For sol 1
-def translate_location(seed, mapping):
-    locations = {}
-    translation = seed
-    if TRACE:
-        path = str(seed)
-    for idx, item in enumerate(mapping):
-        for coord in item['coords']:
-            start, end, offset, skip = coord
-            if TRACE:
-                found = False
-            if start <= translation <= end:
-                translation -= offset
-                if TRACE:
-                    found = True
-                    path += f"\t->\t{translation}"
-                break
-        if TRACE and not found:
-            path += f"\t->\t{translation}"
-    if TRACE:
-        print(path)
-    return translation
-
-# For sol 2
-def translate_location_optimized(seed, mapping, mark_skipped=False):
-    locations = {}
-    translation = seed
-    if TRACE:
-        path = str(seed)
-    prev_mapping_idx = None
-    prev_coord_idx = None
-    for mapping_idx, item in enumerate(mapping):
-        for coord_idx, coord in enumerate(item['coords']):
-            start, end, offset, skip = coord
-            if TRACE:
-                found = False
-            if start <= translation <= end:
-                if skip:
-                    mapping[prev_mapping_idx]['coords'][coord_idx][3] = True
-                    path += f"\t->\t SKIP"
-                    print(path)
-                    return None
-                elif mark_skipped and mapping_idx == len(mapping) - 1:
-                    item['coords'][coord_idx][3] = True
-                    path += f"\t->\t SKIP"
-                    print(path)
-                    return None
-                prev_mapping_idx = mapping_idx
-                prev_coord_idx = coord_idx
-                translation -= offset
-                if TRACE:
-                    found = True
-                    path += f"\t->\t{translation}"
-                break
-        if TRACE and not found:
-            path += f"\t->\t{translation}"
-    if TRACE:
-        print(path)
-    return translation
+    # For each mapping table, we perform a translation for all seeds
+    for item in mapping:
+        ranges = []
+        for seed in seeds:
+            x1, x2 = seed
+            # Reduce scope of ranges to check given large input if out of range
+            for start, end, offset in item:
+                if x1 < start:
+                    # Full range out of scope, need to explore
+                    if x2 <= start:
+                        ranges.append((x1, x2))
+                        seed = None
+                        break
+                    # Partial range out of scope, need to explore
+                    else:
+                        ranges.append((x1, start))
+                        x1 = start
+                # Perform translation if in range
+                if start <= x1 < end:
+                    ranges.append((x1 + offset, min(x2, end) + offset))
+                    # x2 in range, so no need to explore
+                    if x2 <= end:
+                        seed = None
+                        break
+                    # x2 out of range, move x1 up to match and explore remaining partial range
+                    else:
+                        x1 = end
+            # Add seed range if still valid to explore
+            if seed != None:
+                ranges.append(seed)
+        seeds = ranges
+    return seeds
 
 '''''''''''''''''''''
 MAIN SOLVER FUNCTION
 '''''''''''''''''''''
 def solve():
-    seeds_sol1 = []
-    mapping = []
+    # Parse seeds from input
+    seed_data = list(map(int, data[0].split("seeds: ")[1].split()))
+
+    # Parse seed ranges
+    mapping = [[] for i in range(7)]
     idx = -1
-
-    for row in data:
-        if 'seeds' in row:
-            seeds_sol1 = list(map(int, row.split(': ')[1].split()))
-        elif 'map' in row:
+    for item in data[1:]:
+        if 'map' in item:
             idx += 1
-            mapping.append({ 'name': row.split(' map:')[0], 'coords': [] })
         else:
-            dst, src, count = list(map(int, row.split()))
-            # Start, end, offset to subtract to translate to new map, whether to skip coordinate (for eliminating paths in sol 2)
-            coord = [src, src + count - 1, src - dst, False]
-            mapping[idx]['coords'].append(coord)
+            # Parse coords as list of ints
+            coords = list(map(int, item.split()))
 
-    # locations_sol1 = translate_locations(seeds_sol1, mapping)
+            # End, start, offset to subtract to translate back into the mapping
+            end, start, offset = coords
+            mapping[idx].append((start, start + offset, end - start))
 
-    minimum_location = float('inf')
-    skip = []
-    for i in range(0, len(seeds_sol1) - 1, 2):
-        start, end = seeds_sol1[i:i+2]
-        current = float('inf')
-        last_seen = float('inf')
-        mark_skipped = False
-        for j in range(start, start + end):
-            if current != None:
-                last_seen = current
-            if (mark_skipped):
-                print("Skipping")
-            current = translate_location_optimized(j, mapping, mark_skipped)
-            if current != None and current < minimum_location:
-                minimum_location = current
-            if current != None and current > last_seen:
-                mark_skipped = True
+    for i in range(len(mapping)):
+        mapping[i].sort(key=lambda arr: arr[1])
 
-    if DEBUG:
-        for row in mapping:
-            print(row)
-    return None, minimum_location #min(locations_sol1.values()), minimum_location
+    # Compute locations for given seeds
+    seeds = [(location, location + 1) for location in seed_data]
+    min_loc_sol1 = min(translate_locations(seeds, mapping))[0]
+
+    # Compute locations for given seed ranges
+    seeds = [(seed_data[num], seed_data[num] + seed_data[num + 1]) for num in range(0, len(seed_data) - 1, 2)]
+    min_loc_sol2 = min(translate_locations(seeds, mapping))[0]
+
+    return min_loc_sol1, min_loc_sol2
 
 '''''''''''''''''''''
 SETUP
